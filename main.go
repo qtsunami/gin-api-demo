@@ -1,83 +1,47 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"context"
+	"gin-api-demo/pkg/settings"
+
+	//_ "gin-api-demo/pkg/settings"
+	"gin-api-demo/routers"
 	"log"
+	"net/http"
+	"os"
+	"os/signal"
 	"time"
 )
 
-func Logger() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		t := time.Now()
-		c.Set("example", "12345")
-
-		c.Next()
-
-		latency := time.Since(t)
-		log.Print(latency)
-
-		status := c.Writer.Status()
-		log.Println("-===", status)
-	}
-}
-
-func Logger2() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Set("name", "Lee")
-
-		c.Next()
-
-		log.Println("Logger2")
-	}
-}
-
 func main() {
 
-	r := gin.New()
+	router := routers.NewRouter()
 
-	r.Use(Logger2(), Logger())
+	srv := &http.Server{
+		Addr:           ":" + settings.GetConfig().HTTPPort,
+		Handler:        router,
+		ReadTimeout:    settings.GetConfig().ReadTimeout,
+		WriteTimeout:   settings.GetConfig().WriteTimeout,
+		MaxHeaderBytes: 1 << 20,
+	}
 
-	r.GET("/test", func(c *gin.Context) {
-		example := c.MustGet("example").(string)
-		name := c.MustGet("name").(string)
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			log.Printf("Listen: %s\n", err)
+		}
+	}()
 
-		// 打印："12345"
-		log.Println(example, "   ", name)
-	})
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
 
-	// 监听并在 0.0.0.0:8080 上启动服务
-	r.Run(":8080")
+	log.Println("Shutdown Server ...")
 
-	// ==================================================  Demo1 ========================================
-	//r := gin.Default()
-	//r.LoadHTMLGlob("templates/**/*") // 多层目录下文件
-	//r.GET("/", func(cxt *gin.Context) {
-	//	cxt.JSON(http.StatusOK, gin.H{
-	//		"message": "Hello Go",
-	//	})
-	//})
-	//
-	//r.GET("/someJSON", func(c *gin.Context) {
-	//	data := map[string]interface{}{
-	//		"lang": "Go 语言",
-	//		"tag":  "<br/>",
-	//	}
-	//	c.AsciiJSON(http.StatusOK, data)
-	//})
-	//
-	//r.GET("/index", func(c *gin.Context) {
-	//	c.HTML(http.StatusOK, "index/index.html", gin.H{
-	//		"title": "Main website",
-	//	})
-	//})
-	//
-	//r.GET("/users/index", func(c *gin.Context) {
-	//	c.HTML(http.StatusOK, "users/index.tmpl", gin.H{
-	//		"title": "Users",
-	//	})
-	//})
-	//
-	//r.Run()
-	// ==================================================  Demo1 ========================================
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server Shutdown:", err)
+	}
+	log.Println("Server exiting...")
 }

@@ -1,0 +1,8 @@
+Application:
+  APP_NAME: gin-api-demo
+  APP_ENV: local
+  RunMode: debug
+Server:
+  Port: 8080
+  ReadTimeout: 2000
+  WriteTimeout: 2000
