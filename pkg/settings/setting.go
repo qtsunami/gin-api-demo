@@ -8,6 +8,17 @@ import (
 )
 
 type MySQL struct {
+	ConnMaxLifetime int
+	MaxIdleConn     int
+	MaxOpenConn     int
+	ReadConfig      MySQLRead
+	WriteConfig     MySQLWrite
+}
+
+type MySQLRead struct {
+}
+
+type MySQLWrite struct {
 }
 
 type Redis struct {

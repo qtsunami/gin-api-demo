@@ -6,3 +6,20 @@ Server:
   Port: 8080
   ReadTimeout: 2000
   WriteTimeout: 2000
+MySQL:
+  Read:
+    Addr: 127.0.0.1:3306
+    Port: 3306
+    DBName: gin-api
+    User: gin-api
+    Passwd: xxxxxx
+  Write:
+    Addr: 127.0.0.1:3306
+    Port: 3306
+    DBName: gin-api
+    User: gin-api
+    Passwd: xxxxxx
+  Base:
+    ConnMaxLifetime: 60
+    MaxIdleConn: 60
+    MaxOpenConn: 10
