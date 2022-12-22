@@ -3,6 +3,7 @@ package settings
 import (
 	"github.com/spf13/viper"
 	"log"
+	"reflect"
 	"time"
 )
 
@@ -35,11 +36,11 @@ func init() {
 	}
 
 	config = &Config{}
-	config.loadBaseConfig()
+	loadBaseConfig(config)
 }
 
 // loadBaseConfig 加载基础配置
-func (c *Config) loadBaseConfig() {
+func loadBaseConfig(config *Config) {
 	config.RunMode = viper.GetString("Application.RunMode")
 	config.HTTPPort = viper.GetString("Server.Port")
 	config.ReadTimeout = time.Duration(viper.GetInt64("Server.ReadTimeout")) * time.Second
@@ -49,4 +50,15 @@ func (c *Config) loadBaseConfig() {
 // GetConfig 获取配置文件
 func GetConfig() *Config {
 	return config
+}
+
+// GetValue 获取某个具体的配置值
+func (c *Config) GetValue(key string) string {
+	rv := reflect.ValueOf(c)
+	rs := rv.Elem().FieldByName(key)
+
+	if rs.IsValid() {
+		return rs.String()
+	}
+	return ""
 }
