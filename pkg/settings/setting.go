@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/viper"
 	"log"
 	"reflect"
+	"strconv"
 	"time"
 )
 
@@ -11,14 +12,15 @@ type MySQL struct {
 	ConnMaxLifetime int
 	MaxIdleConn     int
 	MaxOpenConn     int
-	ReadConfig      MySQLRead
-	WriteConfig     MySQLWrite
+	ReadConfig      MySQLConfig
+	WriteConfig     MySQLConfig
 }
 
-type MySQLRead struct {
-}
-
-type MySQLWrite struct {
+type MySQLConfig struct {
+	Addr   string
+	DBName string
+	User   string
+	Passwd string
 }
 
 type Redis struct {
@@ -48,6 +50,7 @@ func init() {
 
 	config = &Config{}
 	loadBaseConfig(config)
+	loadMySQLConfig(config)
 }
 
 // loadBaseConfig 加载基础配置
@@ -56,6 +59,15 @@ func loadBaseConfig(config *Config) {
 	config.HTTPPort = viper.GetString("Server.Port")
 	config.ReadTimeout = time.Duration(viper.GetInt64("Server.ReadTimeout")) * time.Second
 	config.WriteTimeout = time.Duration(viper.GetInt64("Server.WriteTimeout")) * time.Second
+}
+
+func loadMySQLConfig(config *Config) {
+
+	var MySQLConfig = new(MySQL)
+
+	config.MySQL.ConnMaxLifetime, _ = strconv.Atoi(viper.GetString("MySQL.Base.ConnMaxLifetime"))
+	config.MySQL.MaxIdleConn, _ = strconv.Atoi(viper.GetString("MySQL.Base.MaxIdleConn"))
+	config.MySQL.MaxOpenConn, _ = strconv.Atoi(viper.GetString("MySQL.Base.MaxOpenConn"))
 }
 
 // GetConfig 获取配置文件
