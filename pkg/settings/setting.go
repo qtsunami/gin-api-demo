@@ -4,7 +4,6 @@ import (
 	"github.com/spf13/viper"
 	"log"
 	"reflect"
-	"strconv"
 	"time"
 )
 
@@ -65,9 +64,10 @@ func loadMySQLConfig(config *Config) {
 
 	var MySQLConfig = new(MySQL)
 
-	config.MySQL.ConnMaxLifetime, _ = strconv.Atoi(viper.GetString("MySQL.Base.ConnMaxLifetime"))
-	config.MySQL.MaxIdleConn, _ = strconv.Atoi(viper.GetString("MySQL.Base.MaxIdleConn"))
-	config.MySQL.MaxOpenConn, _ = strconv.Atoi(viper.GetString("MySQL.Base.MaxOpenConn"))
+	MySQLConfig.ConnMaxLifetime = viper.GetInt("MySQL.Base.ConnMaxLifetime")
+	MySQLConfig.MaxIdleConn = viper.GetInt("MySQL.Base.MaxIdleConn")
+	MySQLConfig.MaxOpenConn = viper.GetInt("MySQL.Base.MaxOpenConn")
+
 }
 
 // GetConfig 获取配置文件
