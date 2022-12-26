@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"gin-api-demo/pkg/settings"
 	"gin-api-demo/routers"
 	"log"
@@ -15,8 +14,6 @@ import (
 func main() {
 
 	router := routers.NewRouter()
-
-	fmt.Println("RunMode is ", settings.GetConfig().GetValue("RunMode"))
 
 	srv := &http.Server{
 		Addr:           ":" + settings.GetConfig().HTTPPort,

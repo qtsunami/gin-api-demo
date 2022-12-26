@@ -11,11 +11,11 @@ type MySQL struct {
 	ConnMaxLifetime int
 	MaxIdleConn     int
 	MaxOpenConn     int
-	ReadConfig      MySQLConfig
-	WriteConfig     MySQLConfig
+	ReadConfig      *MySQLConnConfig
+	WriteConfig     *MySQLConnConfig
 }
 
-type MySQLConfig struct {
+type MySQLConnConfig struct {
 	Addr   string
 	DBName string
 	User   string
@@ -30,7 +30,7 @@ type Config struct {
 	HTTPPort     string
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
-	MySQL        MySQL
+	MySQL        *MySQL
 	Redis        Redis
 }
 
@@ -60,6 +60,7 @@ func loadBaseConfig(config *Config) {
 	config.WriteTimeout = time.Duration(viper.GetInt64("Server.WriteTimeout")) * time.Second
 }
 
+// loadMySQLConfig 加载 MySQL 相关配置
 func loadMySQLConfig(config *Config) {
 
 	var MySQLConfig = new(MySQL)
@@ -67,6 +68,23 @@ func loadMySQLConfig(config *Config) {
 	MySQLConfig.ConnMaxLifetime = viper.GetInt("MySQL.Base.ConnMaxLifetime")
 	MySQLConfig.MaxIdleConn = viper.GetInt("MySQL.Base.MaxIdleConn")
 	MySQLConfig.MaxOpenConn = viper.GetInt("MySQL.Base.MaxOpenConn")
+
+	var ReadMySQLConfig = new(MySQLConnConfig)
+	ReadMySQLConfig.Addr = viper.GetString("MySQL.Read.Addr")
+	ReadMySQLConfig.DBName = viper.GetString("MySQL.Read.DBName")
+	ReadMySQLConfig.User = viper.GetString("MySQL.Read.User")
+	ReadMySQLConfig.Passwd = viper.GetString("MySQL.Read.Passwd")
+
+	var WriteMySQLConfig = new(MySQLConnConfig)
+	WriteMySQLConfig.Addr = viper.GetString("MySQL.Write.Addr")
+	WriteMySQLConfig.DBName = viper.GetString("MySQL.Write.DBName")
+	WriteMySQLConfig.User = viper.GetString("MySQL.Write.User")
+	WriteMySQLConfig.Passwd = viper.GetString("MySQL.Write.Passwd")
+
+	MySQLConfig.ReadConfig = ReadMySQLConfig
+	MySQLConfig.WriteConfig = WriteMySQLConfig
+
+	config.MySQL = MySQLConfig
 
 }
 
