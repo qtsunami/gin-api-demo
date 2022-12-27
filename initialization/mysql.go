@@ -2,6 +2,11 @@ package initialization
 
 import "gorm.io/gorm"
 
+type dbc struct {
+	RDbRepo *gorm.DB
+	WDbRepo *gorm.DB
+}
+
 func New() *gorm.DB {
 
 	RDb := gorm.DB{
